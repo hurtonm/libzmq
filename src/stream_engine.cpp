@@ -307,7 +307,9 @@ void zmq::stream_engine_t::activate_out ()
     //  was sent by the user the socket is probably available for writing.
     //  Thus we try to write the data to socket avoiding polling for POLLOUT.
     //  Consequently, the latency should be better in request/reply scenarios.
-    out_event ();
+    //  Do not apply this optimisation until after the handshaking is done.
+    if (!handshaking)
+        out_event ();
 }
 
 void zmq::stream_engine_t::activate_in ()
