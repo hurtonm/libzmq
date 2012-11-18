@@ -350,6 +350,16 @@ int zmq::socket_base_t::bind (const char *addr_)
         return -1;
     }
 
+#ifdef ZMQ_KNOWS_3_1
+    //  ZMQ_3_1_COMPATIBILITY_MODE context option controls
+    //  whether a session talks with 3.1 peers or uses
+    //  protocol handshaking to detect the peer's version.
+    //  We copy the option value into the socket options.
+    rc = get_ctx ()->get (ZMQ_3_1_COMPATIBILITY_MODE);
+    zmq_assert (rc != -1);
+    options.v3_1_compatibility_mode = rc > 0;
+#endif
+
     if (protocol == "tcp") {
         tcp_listener_t *listener = new (std::nothrow) tcp_listener_t (
             io_thread, this, options);
@@ -524,6 +534,16 @@ int zmq::socket_base_t::connect (const char *addr_)
         if (rc != 0 || port_number == 0)
             return -1;
     }
+#endif
+
+#ifdef ZMQ_KNOWS_3_1
+    //  ZMQ_3_1_COMPATIBILITY_MODE context option controls
+    //  whether a session talks with 3.1 peers or uses
+    //  protocol handshaking to detect the peer's version.
+    //  We copy the option value into the socket options.
+    rc = get_ctx ()->get (ZMQ_3_1_COMPATIBILITY_MODE);
+    zmq_assert (rc != -1);
+    options.v3_1_compatibility_mode = rc > 0;
 #endif
     //  Create session.
     session_base_t *session = session_base_t::create (io_thread, true, this,

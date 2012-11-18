@@ -46,6 +46,9 @@ zmq::ctx_t::ctx_t () :
     slots (NULL),
     max_sockets (ZMQ_MAX_SOCKETS_DFLT),
     io_thread_count (ZMQ_IO_THREADS_DFLT)
+#ifdef ZMQ_KNOWS_3_1
+    , v3_1_compatibility_mode (ZMQ_3_1_COMPATIBILITY_MODE_DFLT)
+#endif
 {
 }
 
@@ -139,6 +142,14 @@ int zmq::ctx_t::set (int option_, int optval_)
         io_thread_count = optval_;
         opt_sync.unlock ();
     }
+#ifdef ZMQ_KNOWS_3_1
+    else
+    if (option_ == ZMQ_3_1_COMPATIBILITY_MODE && optval_ >= 0) {
+        opt_sync.lock ();
+        v3_1_compatibility_mode = optval_;
+        opt_sync.unlock ();
+    }
+#endif
     else {
         errno = EINVAL;
         rc = -1;
@@ -154,6 +165,11 @@ int zmq::ctx_t::get (int option_)
     else
     if (option_ == ZMQ_IO_THREADS)
         rc = io_thread_count;
+#ifdef ZMQ_KNOWS_3_1
+    else
+    if (option_ == ZMQ_3_1_COMPATIBILITY_MODE)
+        rc = v3_1_compatibility_mode;
+#endif
     else {
         errno = EINVAL;
         rc = -1;

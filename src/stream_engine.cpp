@@ -148,6 +148,21 @@ void zmq::stream_engine_t::plug (io_thread_t *io_thread_,
         // disable handshaking for raw socket
         handshaking = false;
     }
+#ifdef ZMQ_KNOWS_3_1
+    //  3.1 uses ZMTP/1.0 wire format.
+    else
+    if (options.v3_1_compatibility_mode) {
+        encoder = new (std::nothrow) encoder_t (out_batch_size);
+        alloc_assert (encoder);
+        encoder->set_msg_source (session);
+
+        decoder = new (std::nothrow) decoder_t (in_batch_size, options.maxmsgsize);
+        alloc_assert (decoder);
+        decoder->set_msg_sink (session);
+
+        handshaking = false;
+    }
+#endif
     else {
         //  Send the 'length' and 'flags' fields of the identity message.
         //  The 'length' field is encoded in the long format.

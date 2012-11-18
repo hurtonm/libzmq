@@ -152,12 +152,20 @@ int zmq::session_base_t::pull_msg (msg_t *msg_)
     //  Unless the socket is in raw mode, the first
     //  message we send is its identity.
     if (unlikely (!identity_sent && !options.raw_sock)) {
+#ifdef ZMQ_KNOWS_3_1
+        if (!options.v3_1_compatibility_mode
+        ||  options.type == ZMQ_DEALER
+        ||  options.type == ZMQ_ROUTER) {
+#endif
         int rc = msg_->init_size (options.identity_size);
         errno_assert (rc == 0);
         memcpy (msg_->data (), options.identity, options.identity_size);
         identity_sent = true;
         incomplete_in = false;
         return 0;
+#ifdef ZMQ_KNOWS_3_1
+        }
+#endif
     }
 
     if (!pipe || !pipe->read (msg_)) {
@@ -174,6 +182,11 @@ int zmq::session_base_t::push_msg (msg_t *msg_)
     //  Unless the socket is in raw mode, the first
     //  message we receive is its identity.
     if (unlikely (!identity_received && !options.raw_sock)) {
+#ifdef ZMQ_KNOWS_3_1
+        if (options.v3_1_compatibility_mode == 0
+        ||  options.type == ZMQ_DEALER
+        ||  options.type == ZMQ_ROUTER) {
+#endif
         msg_->set_flags (msg_t::identity);
         identity_received = true;
         if (!options.recv_identity) {
@@ -183,6 +196,9 @@ int zmq::session_base_t::push_msg (msg_t *msg_)
             errno_assert (rc == 0);
             return 0;
         }
+#ifdef ZMQ_KNOWS_3_1
+        }
+#endif
     }
 
     if (pipe && pipe->write (msg_)) {

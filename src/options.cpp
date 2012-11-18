@@ -50,6 +50,9 @@ zmq::options_t::options_t () :
     filter (false),
     recv_identity (false),
     raw_sock (false),
+#ifdef ZMQ_KNOWS_3_1
+    v3_1_compatibility_mode (false),
+#endif
     tcp_keepalive (-1),
     tcp_keepalive_cnt (-1),
     tcp_keepalive_idle (-1),

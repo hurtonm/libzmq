@@ -118,6 +118,11 @@ namespace zmq
         // if true, router socket accepts non-zmq tcp connections
         bool raw_sock;
 
+#ifdef ZMQ_KNOWS_3_1
+        //  If true, the session assumes version 3.1 peers.
+        bool v3_1_compatibility_mode;
+#endif
+
         //  TCP keep-alive settings.
         //  Defaults to -1 = do not change socket options
         int tcp_keepalive;

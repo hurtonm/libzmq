@@ -161,6 +161,11 @@ namespace zmq
         //  Number of I/O threads to launch.
         int io_thread_count;
 
+#ifdef ZMQ_KNOWS_3_1
+        //  Enables compatibility with 3.1 release.
+        int v3_1_compatibility_mode;
+#endif
+
         //  Synchronisation of access to context options.
         mutex_t opt_sync;
 

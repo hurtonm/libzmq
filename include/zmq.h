@@ -157,10 +157,16 @@ ZMQ_EXPORT const char *zmq_strerror (int errnum);
 /*  Context options                                                           */
 #define ZMQ_IO_THREADS  1
 #define ZMQ_MAX_SOCKETS 2
+#ifdef ZMQ_KNOWS_3_1
+#define ZMQ_3_1_COMPATIBILITY_MODE 3
+#endif
 
 /*  Default for new contexts                                                  */
 #define ZMQ_IO_THREADS_DFLT  1
 #define ZMQ_MAX_SOCKETS_DFLT 1024
+#ifdef ZMQ_KNOWS_3_1
+#define ZMQ_3_1_COMPATIBILITY_MODE_DFLT 0
+#endif
 
 ZMQ_EXPORT void *zmq_ctx_new (void);
 ZMQ_EXPORT int zmq_ctx_destroy (void *context);
